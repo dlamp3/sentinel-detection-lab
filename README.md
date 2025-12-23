@@ -4,7 +4,7 @@
 
 ## Summary
 
-This project outlines the process of setting up Microsoft Sentinel, configuring log ingestion from a single Windows endpoint, and detecting attack activity generated with the Atomic Red Team framework. When an alert triggered, triage was performed to confirm the behavior and collect supporting evidence using custom KQL queries in Log Analytics and Sentinel. The telemetry sources for detections were Windows Security event logs and Sysmon events.
+This project documents setting up Microsoft Sentinel as a SIEM, configuring log ingestion from a Windows endpoint, and enabling analytic rule templates from the Sentinel Content Hub. Alerts were triggered on the endpoint VM using Atomic Red Team simulations. For each alert, an analysis was performed and documented to validate the test behavior, confirm the activity executed successfully, and collect supporting evidence using custom KQL queries in Sentinel.
 
 
 ## Tools Used
