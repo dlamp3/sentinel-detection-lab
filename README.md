@@ -2,7 +2,7 @@
 
 
 
-## Summary
+## Overview
 
 This project documents setting up Microsoft Sentinel as a SIEM, configuring log ingestion from a Windows endpoint, and enabling analytic rule templates from the Sentinel Content Hub. Alerts were triggered on the endpoint VM using Atomic Red Team simulations. For each alert, an analysis was performed and documented to validate the test behavior, confirm the activity executed successfully, and collect supporting evidence using custom KQL queries in Sentinel.
 
