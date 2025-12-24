@@ -4,7 +4,7 @@
 
 ## Overview
 
-This project documents setting up Microsoft Sentinel as a SIEM, configuring log ingestion from a Windows endpoint, and enabling analytic rule templates from the Sentinel Content Hub. Alerts were triggered on the endpoint VM using Atomic Red Team simulations. For each alert, an analysis was performed and documented to validate the test behavior, confirm the activity executed successfully, and collect supporting evidence using custom KQL queries in Sentinel.
+This project documents setting up Microsoft Sentinel as a SIEM, configuring log ingestion from a Windows endpoint, and enabling analytic rule templates from the Sentinel Content Hub. Alerts were triggered on the endpoint VM using Atomic Red Team simulations. For each alert, an analysis was performed and documented to validate the test behavior, confirm the activity executed successfully, and collect supporting evidence using custom KQL queries in Sentinel. Each alert also includes response and prevention recommendations based on the observed activity.
 
 
 ## Tools Used
@@ -26,6 +26,8 @@ This project documents setting up Microsoft Sentinel as a SIEM, configuring log 
 <summary><strong>Virtual Machine Setup</strong></summary>
 
 ## Windows 11 VM + Sysmon
+
+A Windows 11 VM (`Sentinel-Lab`) was built in VMware Workstation and used as the lab endpoint. Sysmon was installed to generate detailed process, network, and file telemetry for Sentinel investigations.
 
 
 ### Windows 11 VM (Victim)
@@ -196,6 +198,8 @@ SecurityEvent
 
 ## Detection Setup
 
+Sentinel analytic rule templates were enabled from **Content Hub** solutions to detect a small set of ATT&CK techniques that can be simulated on a single Windows host. Where a rule depended on specific event IDs or fields, Windows auditing and Sysmon settings were adjusted so the rule query had the data it expects.
+
 
 ### Testing Scope
 
@@ -265,6 +269,9 @@ Detection rule templates were created by selecting the template and choosing **C
 <summary><strong>Attack Simulation</strong></summary>
 
 ## Attack Simulation
+
+Atomic Red Team was used to execute controlled and repeatable attack simulations on the endpoint VM (`Sentinel-Lab`). Each test was run from a clean snapshot, validated in Sentinel, and the VM was reverted to keep the environment consistent.
+
 
 ### Atomic Setup
 - Atomic Red Team: https://github.com/redcanaryco/atomic-red-team  
@@ -474,7 +481,21 @@ No other child process creation was found from the renamed executables within th
 - Security process creation logs showed PowerShell executed `Invoke-WebRequest` on `T1036.003_masquerading.vbs` into the Atomic Red Team ExternalPayloads directory
 - The renamed `taskhostw.exe` (`powershell.exe`) was the only renamed process that spawned child processes (`HOSTNAME.EXE` x2 and `wermgr.exe` x1)
 
- 
+ <br>
+ <br>
+
+### Recommendations
+
+- Response -
+    - Isolate host and preserve evidence
+    - Find and remove the renamed utilities and any downloaded payloads
+    - Hunt for the same renaming pattern across other endpoints
+- Prevention - 
+    - [Restrict File and Directory Permissions (M1022)](https://attack.mitre.org/mitigations/M1022/):
+        - Enforce least privilege permissions
+        - Use File Integrity Monitoring (FIM) tools to monitor changes to critical file permissions
+        - Restrict write access to critical directories such as `C:\Windows\System32`, `C:\`. 
+
 
 ---
 
@@ -621,6 +642,25 @@ Only `conhost.exe` was observed as a process of the elevated `cmd.exe` instance 
 - `fodhelper.exe` spawned a high integrity `cmd.exe` (`S-1-16-12288`, `%%1937`).
 - Filtering on PID `0x610` showed only `conhost.exe` spawned afterward. No other child processes were found.
 
+<br>
+<br>
+
+### Recommendations
+
+- Response - 
+    - Isolate the host
+    - Remove the malicious key values
+    - Search for persistence or changes made under the high integrity process and remove anything found
+    - Check for other registry values changed
+    - Reset credentials for the user
+- Prevention - 
+    - [M1052 - User Account Control](https://attack.mitre.org/mitigations/M1052/):
+        - Require credential prompt instead of just confirmation via Group Policy (`User Account Control: Behavior of the elevation prompt`)
+        - Use EDR tools to detect and block known UAC bypass techniques 
+    - [M1026 - Privileged Account Management](https://attack.mitre.org/mitigations/M1026/):
+        - Remove users from the local administrator group on systems
+
+
 ---
 
 <br>
@@ -758,6 +798,21 @@ Network logs did not return any connections except for normal activity in the re
 <br>
 <br>
 
+
+### Recommendations
+
+- Response - 
+    - Isolate the host and remove/quarantine the dump tool and the dump file
+    - Identify impacted accounts and reset passwords
+    - Hunt for lateral movement and where the dump file may have gone
+- Prevention -
+    - [M1040 - Behavior Prevention on Endpoint](https://attack.mitre.org/mitigations/M1040/):
+        - Enable [Attack Surface Reduction (ASR) rules](https://learn.microsoft.com/en-us/defender-endpoint/attack-surface-reduction) to secure LSASS
+        - Add explicit blocking/detections for common dump tools
+    - [M1043 - Credential Access Protection](https://attack.mitre.org/mitigations/M1043/):
+        - Use Credential Guard to isolate LSASS memory
+        - Enable LSA protection
+
 </details>
 
 
@@ -894,6 +949,25 @@ Results showed that the log sources were cleared with the following command on a
     - Windows PowerShell
 - Sysmon logging was still enabled and forwarding to Sentinel after the clearing.
 - An elevated `powershell.exe` instance enumerated logs and cleared them
+
+<br>
+<br>
+
+### Recommendations
+
+- Response -
+    - Isolate the host
+    - Use Sentinel logs to find additional attacker activity before and after the log clearing
+    - Reset the account that cleared the logs and review privileged activity
+    - Remove any persistence mechanisms found
+- Prevention - 
+    - [M1022 - Restrict File and Directory Permissions](https://attack.mitre.org/mitigations/M1022/):
+        - Protect generated event files that are stored locally with proper permissions and authentication and limit opportunities for adversaries to increase privileges by preventing Privilege Escalation opportunities.
+        - Use File Integrity Monitoring (FIM) tools to monitor changes to critical file permissions
+    - [M1026 - Privileged Account Management](https://attack.mitre.org/mitigations/M1026/):
+        - Restrict and monitor admin usage because clearing logs typically requires elevated privileges
+    - [M1029 - Remote Data Storage](https://attack.mitre.org/mitigations/M1029/):
+        - Configure endpoints to forward security logs to a centralized log collector or SIEM (Sentinel)
 
 </details>
 
