@@ -333,7 +333,7 @@ $PSDefaultParameterValues = @{"Invoke-AtomicTest:PathToAtomicsFolder"="C:\Atomic
 **Alert Information**
 - **Title:** Windows Binaries Lolbins Renamed  
 - **Severity:** Medium  
-- **Time (EST):** Dec 17, 2025 8:29:30 PM – 8:31:33 PM  
+- **Time (UTC):** Dec 18, 2025 01:29:30 - 01:31:33
 - **Entity:** Host `Sentinel-Lab`  
 - **Incident ID:** 48  
 
@@ -381,23 +381,23 @@ Event
 
 2. Examined each instance for further information
 
-    - `cmd.exe` executed `cscript.exe` renamed as `notepad.exe` in `AppData\Roaming` at **8:29:30 PM**  
+    - `cmd.exe` executed `cscript.exe` renamed as `notepad.exe` in `AppData\Roaming` at **01:29:30 UTC**  
 
         ![1st instance](./screenshots/30.png)
 
-    - `cmd.exe` executed `wscript.exe` renamed as `svchost.exe` in `AppData\Roaming` at **8:29:31 PM**  
+    - `cmd.exe` executed `wscript.exe` renamed as `svchost.exe` in `AppData\Roaming` at **01:29:31 UTC**  
 
         ![2nd instance](./screenshots/31.png)
 
-    - `cmd.exe` executed `powershell.exe` renamed as `taskhostw.exe` in `AppData\Roaming` at **8:29:31 PM**  
+    - `cmd.exe` executed `powershell.exe` renamed as `taskhostw.exe` in `AppData\Roaming` at **01:31:31 UTC**  
 
         ![3rd instance](./screenshots/32.png)
 
-    - `powershell.exe` copied `cmd.exe` as `svchost.exe` in `AppData\Local\Temp` at **8:31:32 PM**  
+    - `powershell.exe` copied `cmd.exe` as `svchost.exe` in `AppData\Local\Temp` at **01:31:32 UTC**  
 
         ![4th instance](./screenshots/33.png)
 
-    - `cmd.exe` copied itself as `lsm.exe` into `C:\` at **8:31:33 PM**  
+    - `cmd.exe` copied itself as `lsm.exe` into `C:\` at **01:31:33 UTC**  
 
         ![5th instance](./screenshots/34.png)
 
@@ -472,11 +472,11 @@ No other child process creation was found from the renamed executables within th
 ### Findings
 
 - 5 renamed executables were found
-    - `cmd.exe` executed `cscript.exe` renamed as `notepad.exe` in `AppData\Roaming` at **8:29:30 PM**  
-    - `cmd.exe` executed `wscript.exe` renamed as `svchost.exe` in `AppData\Roaming` at **8:29:31 PM**  
-    - `cmd.exe` executed `powershell.exe` renamed as `taskhostw.exe` in `AppData\Roaming` at **8:29:31 PM**
-    - `powershell.exe` copied `cmd.exe` as `svchost.exe` in `AppData\Local\Temp` at **8:31:32 PM**  
-    - `cmd.exe` copied itself as `lsm.exe` into `C:\` at **8:31:33 PM** 
+    - `cmd.exe` executed `cscript.exe` renamed as `notepad.exe` in `AppData\Roaming` at **01:29:30 UTC**  
+    - `cmd.exe` executed `wscript.exe` renamed as `svchost.exe` in `AppData\Roaming` at **01:29:31 UTC**  
+    - `cmd.exe` executed `powershell.exe` renamed as `taskhostw.exe` in `AppData\Roaming` at **01:31:31 UTC**
+    - `powershell.exe` copied `cmd.exe` as `svchost.exe` in `AppData\Local\Temp` at **01:31:32 UTC**  
+    - `cmd.exe` copied itself as `lsm.exe` into `C:\` at **01:31:33 UTC** 
 - Sysmon network events showed 2 PowerShell HTTPS connections to GitHub prior to the incident
 - Security process creation logs showed PowerShell executed `Invoke-WebRequest` on `T1036.003_masquerading.vbs` into the Atomic Red Team ExternalPayloads directory
 - The renamed `taskhostw.exe` (`powershell.exe`) was the only renamed process that spawned child processes (`HOSTNAME.EXE` x2 and `wermgr.exe` x1)
@@ -515,7 +515,7 @@ No other child process creation was found from the renamed executables within th
 **Alert Information**
 - **Title:** Potential Fodhelper UAC Bypass  
 - **Severity:** Medium  
-- **Time (EST):** Dec 17, 2025 1:30:34 PM  
+- **Time (UTC):** Dec 17, 2025 18:30:34  
 - **Entity:** Host `Sentinel-Lab`  
 - **Incident ID:** 9  
 
@@ -679,7 +679,7 @@ Only `conhost.exe` was observed as a process of the elevated `cmd.exe` instance 
 **Alert Information**
 - **Title:** Dumping LSASS Process Into a File  
 - **Severity:** High  
-- **Time (EST):** Dec 17, 2025 3:12:53 PM  
+- **Time (UTC):** Dec 17, 2025 20:12:53
 - **Entity:** Host `Sentinel-Lab`  
 - **Incident ID:** 26  
 
@@ -826,7 +826,7 @@ Network logs did not return any connections except for normal activity in the re
 **Alert Information**
 - **Title:** NRT Security Event log cleared  
 - **Severity:** Medium  
-- **Time (EST):** Dec 16, 2025 1:17:27 PM    
+- **Time (UTC):** Dec 16, 2025 18:17:27   
 - **Entity:** Host `Sentinel-Lab`  
 - **Incident ID:** 8  
 
@@ -939,7 +939,7 @@ Results showed that the log sources were cleared with the following command on a
 ### Findings
 
 
-- Security audit log cleared at **Dec 16, 2025 1:17:27 PM EST**
+- Security audit log cleared at **Dec 16, 2025 18:17:27 UTC**
 - System log review returned `Event ID` **104** at the same timestamp, showing additional logs were cleared:
     - Application
     - HardwareEvents
